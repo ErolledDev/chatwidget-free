@@ -1,0 +1,31 @@
+Essential Files for Deployment:
+
+/
+├── index.html              # Main landing page
+├── chat.js                # Chat widget implementation
+│
+├── pages/
+│   ├── blog/
+│   │   ├── index.html     # Blog landing page
+│   │   ├── style.css      # Blog styles
+│   │   ├── rss.xml        # Blog RSS feed
+│   │   │
+│   │   └── articles/      # Blog articles
+│   │       ├── 10-tips-for-better-customer-support.html
+│   │       ├── chat-widget-implementation-guide.html
+│   │       ├── future-of-customer-service-2025.html
+│   │       ├── scaling-customer-support.html
+│   │       └── why-chat-widget-is-a-must-have-in-your-website.html
+│   │
+│   ├── form.html          # Widget configuration form
+│   ├── guide.html         # User guide
+│   ├── privacy.html       # Privacy policy
+│   └── terms.html         # Terms of service
+│
+├── robots.txt             # Search engine directives
+└── sitemap.xml           # Site structure for search engines
+
+External Dependencies (via CDN - no local files needed):
+- Tailwind CSS (https://cdn.tailwindcss.com)
+- Remix Icons (https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css)
+- Google Fonts (https://fonts.googleapis.com/css2?family=Inter...)

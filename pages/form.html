@@ -51,36 +51,112 @@
             transform: translateX(0);
         }
 
-        /* Improved Form Responsiveness */
-        @media (max-width: 768px) {
-            .step-buttons {
-                flex-wrap: wrap;
-                gap: 8px;
-            }
-            .step-btn {
-                width: calc(50% - 4px);
-            }
-            .divider {
-                display: none;
-            }
-            .form-grid {
-                grid-template-columns: 1fr;
-            }
+        /* Tutorial Overlay */
+        .tutorial-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 9999;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .tutorial-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .tutorial-spotlight {
+            position: absolute;
+            background: transparent;
+            border: 2px dashed #4f46e5;
+            border-radius: 16px;
+            box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.7);
+            transition: all 0.3s ease;
+            pointer-events: none;
+        }
+
+        .tutorial-arrow {
+            position: absolute;
+            width: 100px;
+            height: 50px;
+            animation: bounce 1s infinite;
+        }
+
+        .tutorial-message {
+            position: relative;
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            width: 90%;
+            animation: fadeInUp 0.5s ease;
+            z-index: 10000;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         /* Widget Preview Animation */
-        #widgetPreview {
+        #business-chat-widget {
             transition: all 0.3s ease;
-            opacity: 0;
-            transform: translateY(20px);
+            opacity: 1; /* Ensure widget is visible */
+            transform: translateY(0); /* Remove initial offset */
         }
-        #widgetPreview.visible {
-            opacity: 1;
-            transform: translateY(0);
+
+        /* Arrow SVG */
+        .curved-arrow {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            pointer-events: none;
+            animation: float 2s infinite ease-in-out;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(45deg); }
+            50% { transform: translateY(-10px) rotate(45deg); }
+        }
+
+        @media (max-width: 768px) {
+            .step-buttons { flex-wrap: wrap; gap: 8px; }
+            .step-btn { width: calc(50% - 4px); }
+            .divider { display: none; }
+            .form-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body class="bg-gray-50">
+    <!-- Tutorial Overlay -->
+    <div id="tutorialOverlay" class="tutorial-overlay">
+        <div class="tutorial-spotlight"></div>
+        <svg class="curved-arrow" viewBox="0 0 100 100" fill="none" stroke="white" stroke-width="3">
+            <path d="M20,80 Q50,50 80,20" marker-end="url(#arrowhead)"/>
+            <defs>
+                <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                    <polygon points="0 0, 10 3.5, 0 7" fill="white"/>
+                </marker>
+            </defs>
+        </svg>
+        <div class="tutorial-message">
+            <h3 class="text-lg font-semibold mb-2">Your Chat Widget Preview</h3>
+            <p class="text-gray-600 mb-4">As you customize your widget, you'll see the changes reflected in the preview at the bottom-right corner in real-time!</p>
+            <button class="mt-4 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors w-full" onclick="closeTutorial()">Got it!</button>
+        </div>
+    </div>
+
     <!-- Mobile Menu -->
     <div id="mobileMenu" class="mobile-menu fixed inset-y-0 left-0 w-64 bg-white shadow-lg z-50">
         <div class="p-4 flex flex-col h-full">
@@ -123,13 +199,10 @@
     </div>
 
     <main class="pt-24">
-        <!-- Header -->
         <div class="gradient-bg text-white py-12">
             <div class="max-w-4xl mx-auto px-6">
                 <h1 class="text-4xl font-bold mb-4">Widget Configuration</h1>
                 <p class="text-lg opacity-90">Create your perfect chat widget in minutes</p>
-                
-                <!-- Steps -->
                 <div class="flex flex-wrap items-center gap-4 mt-8 step-buttons">
                     <button class="step-btn active px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 transition-colors flex-1 md:flex-none" data-step="1">
                         <span class="flex items-center gap-2 justify-center">
@@ -169,13 +242,11 @@
         <div class="max-w-4xl mx-auto px-6 -mt-8 pb-16">
             <div class="glass-effect rounded-xl shadow-2xl p-8">
                 <form id="configForm" class="relative">
-                    <!-- Business Information -->
                     <div class="form-section active" data-step="1">
                         <div class="flex items-center gap-3 mb-8">
                             <div class="h-8 w-1 bg-indigo-600 rounded-full"></div>
                             <h2 class="text-2xl font-semibold text-gray-900">Business Information</h2>
                         </div>
-                        
                         <div class="space-y-6">
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 form-grid">
                                 <div>
@@ -184,24 +255,22 @@
                                         class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
                                         placeholder="Enter your business name">
                                 </div>
-
                                 <div>
                                     <label for="colorScheme" class="block text-sm font-medium text-gray-700 mb-2">Brand Color</label>
                                     <input type="color" id="colorScheme" name="colorScheme" value="#4f46e5"
                                         class="w-full h-12 rounded-lg border border-gray-300 cursor-pointer color-picker">
                                 </div>
                             </div>
-
                             <div>
                                 <label for="businessIcon" class="block text-sm font-medium text-gray-700 mb-2">Business Icon</label>
-                                <p class="text-xs text-gray-500 mb-2">Upload an image or provide a direct URL (e.g., https://example.com/image.jpg)</p>
+                                <p class="text-xs text-gray-500 mb-2">Upload an image or provide a direct URL</p>
                                 <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg hover:border-indigo-500 transition-all cursor-pointer">
                                     <div class="space-y-2 text-center">
-                                        <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
+                                        <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
                                             <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
                                         </svg>
                                         <div class="text-sm text-gray-600">
-                                            <label for="businessIcon" class="relative cursor-pointer rounded-md font-medium text-indigo-600 hover:text-indigo-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-indigo-500">
+                                            <label for="businessIcon" class="relative cursor-pointer rounded-md font-medium text-indigo-600 hover:text-indigo-500">
                                                 <span>Upload a file</span>
                                                 <input id="businessIcon" name="businessIcon" type="file" accept="image/*" class="sr-only">
                                             </label>
@@ -211,7 +280,6 @@
                                 </div>
                                 <input type="text" id="imageUrl" placeholder="Or enter image URL" class="mt-4 w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all">
                             </div>
-
                             <div>
                                 <label for="welcomeMessage" class="block text-sm font-medium text-gray-700 mb-2">Welcome Message</label>
                                 <textarea id="welcomeMessage" name="welcomeMessage" rows="3"
@@ -219,16 +287,14 @@
                                     placeholder="Enter a welcome message for your visitors">👋 Welcome! How can I help you today?</textarea>
                             </div>
                         </div>
-
                         <div class="mt-8 flex justify-end">
                             <button type="button" class="next-btn px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors flex items-center gap-2">
                                 Next Step
-                                <i class="ri-arrow-right-line"></i>
+                                <i class="ri-arrow-right-line`"></i>
                             </button>
                         </div>
                     </div>
 
-                    <!-- Quick Questions -->
                     <div class="form-section inactive" data-step="2">
                         <div class="flex items-center justify-between gap-3 mb-8 flex-wrap">
                             <div class="flex items-center gap-3">
@@ -236,16 +302,12 @@
                                 <h2 class="text-2xl font-semibold text-gray-900">Quick Questions & Answers</h2>
                             </div>
                             <button type="button" id="addQuestionBtn"
-                                class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all text-sm font-medium flex items-center gap-2">
+                                class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-all text-sm font-medium flex items-center gap-2">
                                 <i class="ri-add-line"></i>
                                 Add Question
                             </button>
                         </div>
-                        
-                        <div id="quickQuestions" class="space-y-6">
-                            <!-- Questions will be added here dynamically -->
-                        </div>
-
+                        <div id="quickQuestions" class="space-y-6"></div>
                         <div class="mt-8 flex justify-between flex-wrap gap-4">
                             <button type="button" class="prev-btn px-6 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors flex items-center gap-2">
                                 <i class="ri-arrow-left-line"></i>
@@ -258,13 +320,11 @@
                         </div>
                     </div>
 
-                    <!-- Closing Message -->
                     <div class="form-section inactive" data-step="3">
                         <div class="flex items-center gap-3 mb-8">
                             <div class="h-8 w-1 bg-indigo-600 rounded-full"></div>
                             <h2 class="text-2xl font-semibold text-gray-900">Closing Message</h2>
                         </div>
-                        
                         <div class="space-y-6">
                             <div>
                                 <label for="messageClosing" class="block text-sm font-medium text-gray-700 mb-2">Message</label>
@@ -272,18 +332,13 @@
                                     class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
                                     placeholder="Enter the message to show when all questions are answered">To continue chatting please reach us via the links below:</textarea>
                             </div>
-
-                            <div id="actionButtons" class="space-y-6">
-                                <!-- Action buttons will be added here dynamically -->
-                            </div>
-
+                            <div id="actionButtons" class="space-y-6"></div>
                             <button type="button" id="addActionBtn"
-                                class="w-full px-4 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-all text-sm font-medium flex items-center gap-2 justify-center">
+                                class="w-full px-4 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-all text-sm font-medium flex items-center gap-2 justify-center">
                                 <i class="ri-add-line"></i>
                                 Add Action Button
                             </button>
                         </div>
-
                         <div class="mt-8 flex justify-between flex-wrap gap-4">
                             <button type="button" class="prev-btn px-6 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors flex items-center gap-2">
                                 <i class="ri-arrow-left-line"></i>
@@ -296,22 +351,19 @@
                         </div>
                     </div>
 
-                    <!-- Installation Code -->
                     <div class="form-section inactive" data-step="4">
                         <div class="flex items-center gap-3 mb-8">
                             <div class="h-8 w-1 bg-indigo-600 rounded-full"></div>
                             <h2 class="text-2xl font-semibold text-gray-900">Installation Code</h2>
                         </div>
-                        
                         <div class="relative">
                             <pre id="installationCode" class="bg-gray-900 text-gray-100 rounded-xl p-6 overflow-x-auto text-sm font-mono"></pre>
                             <button type="button" id="copyButton"
-                                class="absolute top-4 right-4 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all text-sm font-medium flex items-center gap-2">
+                                class="absolute top-4 right-4 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-all text-sm font-medium flex items-center gap-2">
                                 <i class="ri-file-copy-line"></i>
                                 Copy
                             </button>
                         </div>
-
                         <div class="mt-8 flex justify-between flex-wrap gap-4">
                             <button type="button" class="prev-btn px-6 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors flex items-center gap-2">
                                 <i class="ri-arrow-left-line"></i>
@@ -327,14 +379,13 @@
             </div>
         </div>
     </main>
-     <!-- Footer -->
+
     <footer class="bg-gray-900 text-white py-12 relative overflow-hidden">
-        <div class="pattern-overlay opacity-10"></div>
         <div class="container mx-auto px-4 sm:px-6 lg:px-8 relative">
             <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
                 <div class="col-span-2">
                     <a href="/" class="text-2xl font-bold text-white hover:text-gray-200 transition-colors">ChatWidget</a>
-                    <p class="mt-4 text-gray-400 max-w-md">Transform your customer support with our free, easy-to-install chat widget. Connect with your customers in real-time.</p>
+                    <p class="mt-4 text-gray-400 max-w-md">Transform your customer support with our free, easy-to-install chat widget.</p>
                 </div>
                 <nav aria-label="Footer navigation">
                     <h3 class="text-lg font-semibold mb-4">Quick Links</h3>
@@ -351,39 +402,30 @@
                 </nav>
                 <div>
                     <h3 class="text-lg font-semibold mb-4">Get Started</h3>
-                    <a href="/pages/form.html" class="inline-block bg-indigo-600 text-white font-medium text-primary-600 px-6 py-3 rounded-lg hover:bg-gray-100 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white hover:text-indigo-600">
+                    <a href="/pages/form.html" class="inline-block bg-indigo-600 text-white font-medium px-6 py-3 rounded-lg hover:bg-gray-100 transition-colors hover:text-indigo-600">
                         Try Now
                     </a>
                 </div>
             </div>
             <div class="mt-12 pt-8 border-t border-gray-800 text-center text-gray-400">
-                <p>&copy;  <span id="fullyear"></span> ChatWidget. All rights reserved.</p>
+                <p>© <span id="fullyear"></span> ChatWidget. All rights reserved.</p>
             </div>
         </div>
     </footer>
 
-  <script>
-  document.addEventListener('DOMContentLoaded', function() {
-    const fullYearElement = document.getElementById('fullyear');
-    if (fullYearElement) {
-      const currentYear = new Date().getFullYear();
-      fullYearElement.textContent = currentYear;
-    }
-  });
-</script>
-
-    <!-- Chat Widget Preview -->
-    <script src="/chat.js"></script>
+    <script src="https://free-widget.netlify.app/chat.js"></script>
 
     <script>
         let imageBase64 = '';
         let questionCount = 0;
         let actionCount = 0;
         let currentStep = 1;
+        let tutorialTimeout;
+        let tutorialShown = false; // Flag to track if the tutorial has been shown
 
         // Mobile Menu
         const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-        const closeMobileMenu = document.getElementById('closeMobileMenu');
+        const closeMenuBtn = document.getElementById('closeMobileMenu');
         const mobileMenu = document.getElementById('mobileMenu');
         const overlay = document.createElement('div');
         overlay.className = 'fixed inset-0 bg-black/50 z-40 hidden';
@@ -402,14 +444,27 @@
         }
 
         mobileMenuBtn.addEventListener('click', () => toggleMobileMenu(true));
-        closeMobileMenu.addEventListener('click', () => toggleMobileMenu(false));
+        closeMenuBtn.addEventListener('click', () => toggleMobileMenu(false));
         overlay.addEventListener('click', () => toggleMobileMenu(false));
+
+        function showTutorial() {
+            if (!tutorialShown) {
+                const overlay = document.getElementById('tutorialOverlay');
+                overlay.classList.add('active');
+                tutorialShown = true; // Set the flag to true after showing the tutorial
+            }
+        }
+
+        function closeTutorial() {
+            const overlay = document.getElementById('tutorialOverlay');
+            overlay.classList.remove('active');
+        }
 
         function createQuestionElement(index) {
             const div = document.createElement('div');
             div.className = 'bg-white rounded-xl shadow-sm p-6 border border-gray-100 hover:border-indigo-500 transition-all relative';
             div.innerHTML = `
-                <button type="button" class="absolute top-4 right-4 text-gray-400 hover:text-red-500 focus:outline-none" onclick="removeQuestion(this.parentElement)">
+                <button type="button" class="absolute top-4 right-4 text-gray-400 hover:text-red-500" onclick="removeQuestion(this.parentElement)">
                     <i class="ri-close-line text-xl"></i>
                 </button>
                 <div class="space-y-4">
@@ -434,7 +489,7 @@
             const div = document.createElement('div');
             div.className = 'bg-white rounded-xl shadow-sm p-6 border border-gray-100 hover:border-indigo-500 transition-all relative';
             div.innerHTML = `
-                <button type="button" class="absolute top-4 right-4 text-gray-400 hover:text-red-500 focus:outline-none" onclick="removeActionButton(this.parentElement)">
+                <button type="button" class="absolute top-4 right-4 text-gray-400 hover:text-red-500" onclick="removeActionButton(this.parentElement)">
                     <i class="ri-close-line text-xl"></i>
                 </button>
                 <div class="space-y-4">
@@ -475,7 +530,6 @@
             element.remove();
             questionCount--;
             updateInstallationCode();
-            
             const questions = document.querySelectorAll('#quickQuestions > div');
             questions.forEach((q, index) => {
                 const labels = q.querySelectorAll('label');
@@ -491,7 +545,6 @@
             element.remove();
             actionCount--;
             updateInstallationCode();
-            
             const actions = document.querySelectorAll('#actionButtons > div');
             actions.forEach((a, index) => {
                 const labels = a.querySelectorAll('label');
@@ -544,35 +597,28 @@
 <\/script>`;
             
             document.getElementById('installationCode').textContent = code;
-
-            // Update live preview
             window.businessChatConfig = config;
+
+            if (!tutorialShown) {
+                clearTimeout(tutorialTimeout);
+                tutorialTimeout = setTimeout(showTutorial, 1000);
+            }
         }
 
         function updateProgress() {
             const progress = ((currentStep - 1) / 3) * 100;
             document.getElementById('progressBar').style.width = `${progress}%`;
-            
             document.querySelectorAll('.step-btn').forEach((btn, index) => {
-                if (index + 1 === currentStep) {
-                    btn.classList.add('bg-white', 'text-indigo-600');
-                    btn.classList.remove('bg-white/10');
-                } else {
-                    btn.classList.remove('bg-white', 'text-indigo-600');
-                    btn.classList.add('bg-white/10');
-                }
+                btn.classList.toggle('bg-white', index + 1 === currentStep);
+                btn.classList.toggle('text-indigo-600', index + 1 === currentStep);
+                btn.classList.toggle('bg-white/10', index + 1 !== currentStep);
             });
         }
 
         function showStep(step) {
             document.querySelectorAll('.form-section').forEach(section => {
-                if (parseInt(section.dataset.step) === step) {
-                    section.classList.remove('inactive');
-                    section.classList.add('active');
-                } else {
-                    section.classList.add('inactive');
-                    section.classList.remove('active');
-                }
+                section.classList.toggle('active', parseInt(section.dataset.step) === step);
+                section.classList.toggle('inactive', parseInt(section.dataset.step) !== step);
             });
             currentStep = step;
             updateProgress();
@@ -591,24 +637,14 @@
             }
         });
 
-        document.getElementById('imageUrl').addEventListener('input', (e) => {
-            imageBase64 = '';
-            updateInstallationCode();
-        });
-
-        document.getElementById('configForm').addEventListener('input', (e) => {
-            if (e.target.id !== 'businessIcon') {
-                updateInstallationCode();
-            }
-        });
-
+        document.getElementById('imageUrl').addEventListener('input', updateInstallationCode);
+        document.getElementById('configForm').addEventListener('input', updateInstallationCode);
         document.getElementById('addQuestionBtn').addEventListener('click', addQuestion);
         document.getElementById('addActionBtn').addEventListener('click', addActionButton);
 
         document.getElementById('copyButton').addEventListener('click', () => {
             const code = document.getElementById('installationCode').textContent;
             navigator.clipboard.writeText(code);
-            
             const button = document.getElementById('copyButton');
             button.innerHTML = '<i class="ri-check-line"></i> Copied!';
             setTimeout(() => {
@@ -616,34 +652,29 @@
             }, 2000);
         });
 
-        // Navigation
         document.querySelectorAll('.step-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const step = parseInt(btn.dataset.step);
-                showStep(step);
-            });
+            btn.addEventListener('click', () => showStep(parseInt(btn.dataset.step)));
         });
 
         document.querySelectorAll('.next-btn').forEach(btn => {
             btn.addEventListener('click', () => {
-                if (currentStep < 4) {
-                    showStep(currentStep + 1);
-                }
+                if (currentStep < 4) showStep(currentStep + 1);
             });
         });
 
         document.querySelectorAll('.prev-btn').forEach(btn => {
             btn.addEventListener('click', () => {
-                if (currentStep > 1) {
-                    showStep(currentStep - 1);
-                }
+                if (currentStep > 1) showStep(currentStep - 1);
             });
         });
 
-        // Initialize
-        addQuestion();
-        addActionButton();
-        updateInstallationCode(); // This will initialize the chat widget preview
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('fullyear').textContent = new Date().getFullYear();
+            addQuestion();
+            addActionButton();
+            updateInstallationCode();
+            showTutorial(); // Show tutorial on first visit or refresh
+        });
     </script>
 </body>
 </html>
